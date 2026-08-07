@@ -38,3 +38,32 @@ index= SearchIndex(name=index_name, fields=fields)
 client.create_index(index)
 print(f"Created Index: {index_name}")
 
+
+#load _csv
+
+df = pd.read_csv("data/aaitech_vector_schema_info.csv")
+df=df.fillna("")
+
+
+#Intialise Search Clinet - using client to upload the document
+search_client=SearchClient(
+    endpoint=endpoint,
+    index_name=index_name,
+    credential=AzureKeyCredential(key)
+)
+
+#prepare and clean documents
+documents = []
+for _,row in df.iterrows():
+    doc={
+        "id":str(row["id"]),
+        "type":str(row["type"]),
+        "name":str(row["name"]),
+        "description":str(row["description"]),
+        "columns":str(row["columns"])
+    }
+    documents.append(doc)
+
+#Upload the documents
+result = search_client.upload_documents(documents=documents)
+print(f"Uploaded {len(documents)} documents")
