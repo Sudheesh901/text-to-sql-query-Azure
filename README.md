@@ -1,8 +1,27 @@
 # Beavelo
 
-Beavelo is a production-style natural language to SQL assistant for business users. It translates plain-English questions into safe, read-only MySQL queries and returns results in a user-friendly experience through both a Streamlit web app and a FastAPI API.
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue) ![FastAPI](https://img.shields.io/badge/FastAPI-API-009688) ![Streamlit](https://img.shields.io/badge/Streamlit-UI-ff4b4b) ![Azure](https://img.shields.io/badge/Azure-OpenAI%20%2B%20Search-0078D4)
+
+Beavelo is a production-style natural language to SQL assistant for business users. It translates plain-English questions into safe, read-only MySQL queries and returns results through both a Streamlit web app and a FastAPI API.
 
 The system is designed for non-technical users who need answers from an existing sales database without writing SQL manually. It combines Azure OpenAI for query generation, Azure AI Search for schema retrieval, and a database execution layer that enforces safety constraints.
+
+## Table of contents
+
+- [Why this project exists](#why-this-project-exists)
+- [Key features](#key-features)
+- [Architecture overview](#architecture-overview)
+- [Tech stack](#tech-stack)
+- [Project structure](#project-structure)
+- [Quick start](#quick-start)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Running the application](#running-the-application)
+- [API usage](#api-usage)
+- [Safety and validation model](#safety-and-validation-model)
+- [Evaluation and testing](#evaluation-and-testing)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Why this project exists
 
@@ -31,23 +50,15 @@ The application converts those requests into SQL, validates the output, and retu
 
 ## Architecture overview
 
-```text
-User Question
-    │
-    ▼
-Streamlit UI / FastAPI API
-    │
-    ▼
-Schema Retrieval (Azure AI Search)
-    │
-    ▼
-Azure OpenAI -> SQL Generation
-    │
-    ▼
-Safety Validation + MySQL Execution
-    │
-    ▼
-Results returned to the user
+```mermaid
+flowchart LR
+    A[User question] --> B[Streamlit UI]
+    B --> C[FastAPI API]
+    C --> D[Azure AI Search]
+    D --> E[Azure OpenAI]
+    E --> F[Safety validation]
+    F --> G[MySQL execution]
+    G --> H[Results returned to user]
 ```
 
 ### Components
@@ -101,6 +112,20 @@ Results returned to the user
 ├── requirements.txt
 └── .env                        # Local environment variables (not committed)
 ```
+
+---
+
+## Quick start
+
+If you want to get up and running quickly, the typical flow is:
+
+1. Install dependencies with `pip install -r requirements.txt`
+2. Create a `.env` file with your Azure OpenAI, Azure AI Search, and MySQL credentials
+3. Run `python create_and_upload_index.py` to populate the search catalog
+4. Start the API with `uvicorn api.main:app --reload --port 8000`
+5. Launch the UI with `streamlit run app.py`
+
+> For the full setup and environment details, continue to the sections below.
 
 ---
 
