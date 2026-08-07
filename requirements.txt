@@ -4,3 +4,8 @@ mysql-connector-python
 pandas
 azure-search-documents
 streamlit
+fastapi
+uvicorn[standard]
+requests
+pytest
+httpx

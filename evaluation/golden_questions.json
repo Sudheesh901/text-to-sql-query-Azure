@@ -1,0 +1,49 @@
+[
+  {
+    "id": "customers_in_germany",
+    "question": "Which customers are located in Germany?",
+    "should_clarify": false,
+    "expected_columns": [
+      "customer_id",
+      "company_name",
+      "contact_name",
+      "city",
+      "country"
+    ]
+  },
+  {
+  "id": "top_products_by_quantity",
+  "question": "Show the top 3 products by total quantity ordered. Return product_name and name the aggregated quantity total_quantity.",
+  "should_clarify": false,
+  "expected_columns": [
+    "product_name",
+    "total_quantity"
+  ]
+},
+  {
+    "id": "top_customer_product_pairs",
+    "question": "Show the top 3 customer-product combinations by total quantity ordered. Return customer_id, company_name, product_name, and total quantity.",
+    "should_clarify": false,
+    "expected_columns": [
+      "customer_id",
+      "company_name",
+      "product_name",
+      "total_quantity"
+    ]
+  },
+  {
+    "id": "supplier_products",
+    "question": "Show each supplier and the number of products they supply.",
+    "should_clarify": false,
+    "expected_columns": [
+      "company_name",
+      "product_count"
+    ]
+  },
+  {
+    "id": "ambiguous_top_customers",
+    "question": "List the top three customers in terms of quantity purchased along with product names.",
+    "should_clarify": true,
+    "expected_columns": []
+  }
+]

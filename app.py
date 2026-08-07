@@ -1,7 +1,11 @@
+import os
+
+import pandas as pd
+import requests
 import streamlit as st
 
-from database import execute_query
-from text_to_sql import question_to_sql
+
+API_BASE_URL = os.getenv("BEAVELO_API_URL", "http://127.0.0.1:8000")
 
 
 st.set_page_config(
@@ -244,27 +248,24 @@ def reset_workspace():
         st.session_state[key] = "" if key == "question_input" else None
 
 
-def execute_generated_sql(sql_query, original_question):
-    """Execute SQL and use the backend's one correction attempt if it fails."""
+def ask_beavelo(question):
+    """Call the FastAPI backend and return its JSON response."""
     try:
-        return sql_query, execute_query(sql_query), None
-    except Exception as error:
-        corrected_sql = question_to_sql(
-            original_question,
-            previous_sql=sql_query,
-            database_error=str(error),
+        response = requests.post(
+            f"{API_BASE_URL}/v1/query",
+            json={"question": question},
+            timeout=45,
         )
-        if corrected_sql.startswith(("CLARIFY:", "INVALID_SQL:")):
-            return corrected_sql, None, str(error)
-
-        try:
-            return corrected_sql, execute_query(corrected_sql), None
-        except Exception as corrected_error:
-            return corrected_sql, None, str(corrected_error)
+        response.raise_for_status()
+        return response.json()
+    except requests.RequestException as error:
+        raise RuntimeError(
+            "Beavelo is temporarily unavailable. Please try again."
+        ) from error
 
 
 def process_question(question):
-    """Generate SQL, route clarifications to the UI, and store final results."""
+    """Send a question to the API and store its UI-ready response."""
     clean_question = question.strip()
     if not clean_question:
         return
@@ -278,27 +279,36 @@ def process_question(question):
         st.session_state.notice = "Hello — what would you like to learn from your data?"
         return
 
-    sql_query = question_to_sql(clean_question)
-    if sql_query.startswith("CLARIFY:"):
-        st.session_state.pending_question = clean_question
-        st.session_state.clarification = sql_query.removeprefix("CLARIFY:").strip()
-        return
-    if sql_query.startswith("INVALID_SQL:"):
-        st.session_state.error = sql_query.removeprefix("INVALID_SQL:").strip()
+    try:
+        response = ask_beavelo(clean_question)
+    except RuntimeError as error:
+        st.session_state.error = str(error)
         return
 
-    final_sql, results, error = execute_generated_sql(sql_query, clean_question)
-    if final_sql.startswith("CLARIFY:"):
+    status = response.get("status")
+    if status == "clarification":
         st.session_state.pending_question = clean_question
-        st.session_state.clarification = final_sql.removeprefix("CLARIFY:").strip()
+        st.session_state.clarification = response.get(
+            "message",
+            "Could you clarify your question?",
+        )
         return
-    if final_sql.startswith("INVALID_SQL:"):
-        st.session_state.error = final_sql.removeprefix("INVALID_SQL:").strip()
+    if status == "error":
+        st.session_state.error = response.get(
+            "message",
+            "We could not complete that request.",
+        )
         return
 
-    st.session_state.sql_query = final_sql
-    st.session_state.results = results
-    st.session_state.error = error
+    if status != "success":
+        st.session_state.error = "The API returned an unexpected response."
+        return
+
+    st.session_state.sql_query = response.get("sql")
+    st.session_state.results = pd.DataFrame(
+        response.get("rows", []),
+        columns=response.get("columns", []),
+    )
 
 
 initialise_state()
