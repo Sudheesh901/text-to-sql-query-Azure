@@ -372,21 +372,20 @@ with st.form("question_form", clear_on_submit=False):
         label_visibility="collapsed",
     )
     submit = st.form_submit_button("Generate answer", use_container_width=True)
-
-st.markdown(
-    """
-    <div class='plain-language-card'>
-        <h3>What does Beavelo do?</h3>
-        <p>It helps anyone explore business data without writing code or knowing how the database is organised.</p>
-        <div class='plain-language-steps'>
-            <div class='plain-language-step'><strong>1. Ask</strong>Write your question as you would ask a colleague.</div>
-            <div class='plain-language-step'><strong>2. Beavelo looks it up</strong>It creates the database query in the background.</div>
-            <div class='plain-language-step'><strong>3. Get the answer</strong>Review the result and, if you wish, the SQL behind it.</div>
-        </div>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+# st.markdown(
+#     """
+#     <div class='plain-language-card'>
+#         <h3>What does Beavelo do?</h3>
+#         <p>It helps anyone explore business data without writing code or knowing how the database is organised.</p>
+#         <div class='plain-language-steps'>
+#             <div class='plain-language-step'><strong>1. Ask</strong>Write your question as you would ask a colleague.</div>
+#             <div class='plain-language-step'><strong>2. Beavelo looks it up</strong>It creates the database query in the background.</div>
+#             <div class='plain-language-step'><strong>3. Get the answer</strong>Review the result and, if you wish, the SQL behind it.</div>
+#         </div>
+#     </div>
+#     """,
+#     unsafe_allow_html=True,
+# )
 
 if submit:
     with st.spinner("Preparing your answer..."):
