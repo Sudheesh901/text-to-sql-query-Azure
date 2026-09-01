@@ -70,6 +70,12 @@ flowchart LR
 - create_and_upload_index.py: builds and populates the Azure AI Search index
 - scripts/: evaluation and schema verification utilities
 
+## Deployment status
+
+The FastAPI backend is deployed successfully to Azure Container Apps. The deployment uses an Azure Container Registry image (`tenantdbagent.azurecr.io/beavelo-api:latest`) and exposes the API through Container Apps HTTP ingress on port 8000.
+
+The deployed service has passed its health check at `/health`. Runtime configuration, including Azure OpenAI, Azure AI Search, and MySQL credentials, is supplied through Container App environment variables and must not be committed to source control.
+
 ---
 
 ## Tech stack
